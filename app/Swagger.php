@@ -1,7 +1,5 @@
 <?php
 
-namespace App\Http\Controllers;
-
 /**
  * @OA\Info(
  *     title="Siegman API",
@@ -14,7 +12,3 @@ namespace App\Http\Controllers;
  *     description="API Server"
  * )
  */
-abstract class Controller
-{
-    //
-}
