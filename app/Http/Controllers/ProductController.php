@@ -27,6 +27,25 @@ class ProductController extends Controller
      *         required=false,
      *         @OA\Schema(type="integer")
      *     ),
+     *     @OA\Parameter(
+     *         name="search",
+     *         in="query",
+     *         required=false,
+     *         @OA\Schema(type="string"),
+     *         description="Search by product name or description"
+     *     ),
+     *     @OA\Parameter(
+     *         name="page",
+     *         in="query",
+     *         required=false,
+     *         @OA\Schema(type="integer", default=1)
+     *     ),
+     *     @OA\Parameter(
+     *         name="per_page",
+     *         in="query",
+     *         required=false,
+     *         @OA\Schema(type="integer", default=15)
+     *     ),
      *     @OA\Response(response=200, description="List of products"),
      *     security={{"sanctum":{}}}
      * )
@@ -40,16 +59,26 @@ class ProductController extends Controller
                 $query->where('category_id', $request->category_id);
             }
 
-            $products = $query->get();
+            if ($request->has('search')) {
+                $search = $request->search;
+                $query->where(function($q) use ($search) {
+                    $q->where('name', 'like', '%' . $search . '%')
+                      ->orWhere('description', 'like', '%' . $search . '%');
+                });
+            }
+
+            $perPage = $request->input('per_page', 15);
+            $products = $query->paginate($perPage);
             
             // Add full URLs for image and catalog_pdf
-            $products->each(function ($product) {
+            $products->getCollection()->transform(function ($product) {
                 if ($product->image) {
                     $product->image_url = asset('storage/' . $product->image);
                 }
                 if ($product->catalog_pdf) {
                     $product->catalog_pdf_url = asset('storage/' . $product->catalog_pdf);
                 }
+                return $product;
             });
             
             return ApiResponse::success($products, 'Products retrieved successfully');

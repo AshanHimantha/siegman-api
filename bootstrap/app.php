@@ -18,6 +18,11 @@ return Application::configure(basePath: dirname(__DIR__))
             \App\Http\Middleware\ForceJsonResponse::class,
         ]);
 
+        // Enable CORS for API routes
+        $middleware->validateCsrfTokens(except: [
+            'api/*',
+        ]);
+
         // Staff middleware alias and group (Sanctum + staff check)
         $middleware->alias([
             'staff' => \App\Http\Middleware\StaffMiddleware::class,
