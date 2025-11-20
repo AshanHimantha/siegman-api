@@ -23,6 +23,19 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('categories/{category}', [\App\Http\Controllers\CategoryController::class, 'destroy']);
 });
 
+// Products API
+// Publicly accessible GET routes for products
+Route::get('products', [\App\Http\Controllers\ProductController::class, 'index']);
+Route::get('products/{product}', [\App\Http\Controllers\ProductController::class, 'show']);
+
+// Protected routes for products (create, update, delete)
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('products', [\App\Http\Controllers\ProductController::class, 'store']);
+    Route::put('products/{product}', [\App\Http\Controllers\ProductController::class, 'update']);
+    Route::patch('products/{product}', [\App\Http\Controllers\ProductController::class, 'update']);
+    Route::delete('products/{product}', [\App\Http\Controllers\ProductController::class, 'destroy']);
+});
+
 // Authenticated group (any logged-in user)
 Route::middleware('auth')->group(function () {
     Route::get('/user', function (Request $request) {

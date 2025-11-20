@@ -138,24 +138,43 @@ class CategoryController extends Controller
     }
 
     /**
-     * @OA\Post(
+     * @OA\Put(
      *     path="/categories/{id}",
      *     tags={"Categories"},
-     *     summary="Update a category",
+     *     summary="Replace/update a category",
      *     @OA\Parameter(
      *         name="id",
      *         in="path",
      *         required=true,
      *         @OA\Schema(type="integer")
      *     ),
-     *     @OA\Parameter(
-     *         name="_method",
-     *         in="query",
-     *         required=true,
-     *         @OA\Schema(type="string", enum={"PUT"})
-     *     ),
      *     @OA\RequestBody(
      *         required=true,
+     *         @OA\MediaType(
+     *             mediaType="multipart/form-data",
+     *             @OA\Schema(
+     *                 @OA\Property(property="name", type="string"),
+     *                 @OA\Property(property="description", type="string"),
+     *                 @OA\Property(property="image", type="string", format="binary")
+     *             )
+     *         )
+     *     ),
+     *     @OA\Response(response=200, description="Category updated"),
+     *     @OA\Response(response=404, description="Category not found"),
+     *     security={{"sanctum":{}}}
+     * )
+     * @OA\Patch(
+     *     path="/categories/{id}",
+     *     tags={"Categories"},
+     *     summary="Partially update a category",
+     *     @OA\Parameter(
+     *         name="id",
+     *         in="path",
+     *         required=true,
+     *         @OA\Schema(type="integer")
+     *     ),
+     *     @OA\RequestBody(
+     *         required=false,
      *         @OA\MediaType(
      *             mediaType="multipart/form-data",
      *             @OA\Schema(
@@ -239,6 +258,11 @@ class CategoryController extends Controller
 
             if (!$category) {
                 return ApiResponse::notFound('Category not found');
+            }
+
+            // Prevent deletion if category has products
+            if ($category->products()->exists()) {
+                return ApiResponse::error('Cannot delete category with existing products. Remove products first.', 409);
             }
 
             // Delete image file if exists

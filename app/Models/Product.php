@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class Category extends Model
+class Product extends Model
 {
     use HasFactory;
 
@@ -17,8 +17,10 @@ class Category extends Model
      */
     protected $fillable = [
         'name',
+        'category_id',
         'description',
         'image',
+        'catalog_pdf',
     ];
 
     /**
@@ -27,15 +29,16 @@ class Category extends Model
      * @var array<string, string>
      */
     protected $casts = [
+        'category_id' => 'integer',
         'created_at' => 'datetime',
         'updated_at' => 'datetime',
     ];
 
     /**
-     * Get the products for this category.
+     * Get the category that owns the product.
      */
-    public function products(): HasMany
+    public function category(): BelongsTo
     {
-        return $this->hasMany(Product::class);
+        return $this->belongsTo(Category::class);
     }
 }
