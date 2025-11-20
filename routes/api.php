@@ -5,9 +5,23 @@ use Illuminate\Support\Facades\Route;
 
 
 
+
 // Auth APIs
 Route::post('/login', [\App\Http\Controllers\AuthController::class, 'login']);
 Route::post('/logout', [\App\Http\Controllers\AuthController::class, 'logout'])->middleware('auth');
+
+// Categories API
+// Publicly accessible GET routes for categories
+Route::get('categories', [\App\Http\Controllers\CategoryController::class, 'index']);
+Route::get('categories/{category}', [\App\Http\Controllers\CategoryController::class, 'show']);
+
+// Protected routes for categories (create, update, delete)
+Route::middleware('auth:sanctum')->group(function () {
+    Route::post('categories', [\App\Http\Controllers\CategoryController::class, 'store']);
+    Route::put('categories/{category}', [\App\Http\Controllers\CategoryController::class, 'update']);
+    Route::patch('categories/{category}', [\App\Http\Controllers\CategoryController::class, 'update']);
+    Route::delete('categories/{category}', [\App\Http\Controllers\CategoryController::class, 'destroy']);
+});
 
 // Authenticated group (any logged-in user)
 Route::middleware('auth')->group(function () {
